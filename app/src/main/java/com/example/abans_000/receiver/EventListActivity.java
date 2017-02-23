@@ -1,8 +1,10 @@
 package com.example.abans_000.receiver;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -41,6 +43,19 @@ public class EventListActivity extends AppCompatActivity {
 
         eventListView.setAdapter(mEventAdapter);
         eventListView.setEmptyView(mEmptyStateTextView);
+
+        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Event event = mEventAdapter.getItem(position);
+                Intent eventIntent = new Intent(EventListActivity.this, EventActivity.class);
+                eventIntent.putExtra("title", event.getTitle());
+                eventIntent.putExtra("stime", event.getStart());
+                eventIntent.putExtra("ftime", event.getFinish());
+                eventIntent.putExtra("description", event.getDescription());
+                startActivity(eventIntent);
+            }
+        });
 
         mChildListener = new ChildEventListener() {
             @Override
