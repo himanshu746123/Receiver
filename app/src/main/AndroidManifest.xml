@@ -54,6 +54,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".EventListActivity"></activity>
+
+        <service android:name=".services.ScheduleService" />
+        <service android:name=".services.NotifyService" />
+
     </application>
 
 </manifest>
