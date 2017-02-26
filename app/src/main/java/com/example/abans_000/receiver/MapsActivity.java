@@ -1,10 +1,16 @@
 package com.example.abans_000.receiver;
 
 import android.*;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -207,8 +213,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         final DatabaseReference mEventReference = mFirebaseDatabase.getReference().child("events");
         mMarkerEventMap = new HashMap<>();
 
-        final IconGenerator iconGenerator = new IconGenerator(MapsActivity.this);
-        iconGenerator.setStyle(IconGenerator.STYLE_BLUE);
+//        final IconGenerator iconGenerator = new IconGenerator(MapsActivity.this);
+//        iconGenerator.setStyle(IconGenerator.STYLE_BLUE);
 
         mEventReference.addChildEventListener(new ChildEventListener() {
             @Override
@@ -216,10 +222,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 Event event = dataSnapshot.getValue(Event.class);
                 long tm = System.currentTimeMillis();
                 if (tm >= (event.getStart() - 30 * 60 * 1000) && tm <= event.getFinish()) {
-                    Bitmap bitmap = iconGenerator.makeIcon(event.getTitle());
-                    BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
-                    Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(event.getLatitude(), event.getLongitude()))
-                            .icon(icon)
+                    //Bitmap bitmap = iconGenerator.makeIcon(event.getTitle());
+//                    Bitmap bitmap = drawTextToBitmap(getApplicationContext(), R.drawable.google_marker_r, event.getTitle());
+//                    BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
+                    Marker marker = mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(event.getLatitude(), event.getLongitude()))
+                            //.icon(icon)
+                            .snippet(event.getDescription())
                             .title(event.getTitle()));
                     mMarkerEventMap.put(marker, event);
                 } else if (tm > event.getFinish()) {
@@ -250,9 +259,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
+            public void onInfoWindowClick(Marker marker) {
                 Event event = mMarkerEventMap.get(marker);
                 //Toast.makeText(MapsActivity.this, event.getDescription(), Toast.LENGTH_SHORT).show();
                 Intent eventIntent = new Intent(MapsActivity.this, EventActivity.class);
@@ -261,7 +270,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 eventIntent.putExtra("ftime", event.getFinish());
                 eventIntent.putExtra("description", event.getDescription());
                 startActivity(eventIntent);
-                return true;
             }
         });
     }
